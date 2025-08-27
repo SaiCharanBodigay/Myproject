@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Glossy White Page with Crystal Bubbles</title>
+  <!-- Use Anton Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      background: linear-gradient(
+        to bottom,
+        #ffffff 0%,
+        #f5f5f5 40%,
+        #eaeaea 100%
+      );
+      overflow: hidden;
+    }
+    .glossy-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.7) 0%,
+        rgba(255,255,255,0.3) 30%,
+        rgba(255,255,255,0) 100%
+      );
+      z-index: 1;
+    }
+    .bubble {
+      position: absolute;
+      bottom: -100px;
+      border-radius: 50%;
+      z-index: 2;
+      animation: floatUp linear forwards;
+      pointer-events: none;
+      box-shadow: 0 0 24px 6px rgba(255,255,255,0.25), 0 0 60px 10px rgba(0,0,0,0.07) inset;
+      opacity: 0.85;
+      border: 1.5px solid rgba(255,255,255,0.5);
+      overflow: visible;
+    }
+    .bubble::after {
+      content: '';
+      position: absolute;
+      left: 18%;
+      top: 15%;
+      width: 30%;
+      height: 30%;
+      background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.05) 80%);
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(1px);
+    }
+    @keyframes floatUp {
+      to {
+        transform: translateY(-110vh) scale(1.1);
+        opacity: 0.2;
+      }
+    }
+    /* Centered typing message directly on background */
+    .center-message {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 6rem;
+      font-family: 'Anton', Arial, Helvetica, sans-serif;
+      background: none;
+      border: none;
+      padding: 0;
+      box-shadow: none;
+      z-index: 5;
+      letter-spacing: 2px;
+      text-align: center;
+      user-select: none;
+      /* Softer rainbow gradient text with transparency */
+      background: linear-gradient(90deg, 
+        rgba(255,0,128,0.55), 
+        rgba(121,40,202,0.55), 
+        rgba(0,207,255,0.55), 
+        rgba(0,255,184,0.55), 
+        rgba(255,230,0,0.55), 
+        rgba(255,0,128,0.55)
+      );
+      background-size: 200% auto;
+      color: transparent;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      opacity: 0.82; /* transparent touch */
+      animation: rainbowText 3s linear infinite;
+      text-shadow:
+        2px 2px 8px rgba(0,0,0,0.12), /* soft shadow */
+        0 2px 8px rgba(0,0,0,0.10),    /* more shadow */
+        0 0 12px rgba(0,0,0,0.08);     /* glow effect */
+    }
+    @keyframes rainbowText {
+      to {
+        background-position: 200% center;
+      }
+    }
+    .center-message .cursor {
+      display: inline-block;
+      width: 1ch;
+      animation: blink 1s steps(1) infinite;
+      color: #888;
+      background: none;
+      -webkit-text-fill-color: #888;
+      opacity: 0.5;
+    }
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+    <div class="glossy-overlay"></div>
+    <div class="center-message"><span id="typedText"></span><span class="cursor">|</span></div>
+    <!-- Typing sound effect (hidden, short sound) -->
+    <audio id="typeSound" src="keyboard-typing-sound-effect-335503.mp3" preload="auto"></audio>
+    <script>
+      // Array of border-radius for different organic shapes
+      const shapes = [
+        "50%", // perfect circle
+        "60% 40% 60% 40% / 50% 60% 40% 50%", // organic
+        "50% 60% 40% 60% / 60% 50% 60% 40%", // organic
+        "60% 50% 60% 50% / 50% 60% 50% 60%", // organic
+        "70% 30% 60% 40% / 60% 70% 30% 40%"  // organic
+      ];
+
+      // Rainbow gradient backgrounds for crystal/soap effect
+      const gradients = [
+        "radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.3) 20%, rgba(255,0,255,0.18) 40%, rgba(0,255,255,0.18) 60%, rgba(255,255,0,0.18) 80%, rgba(255,255,255,0.1) 100%)",
+        "radial-gradient(circle at 70% 70%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 20%, rgba(0,255,255,0.18) 40%, rgba(255,0,255,0.18) 60%, rgba(255,255,0,0.18) 80%, rgba(255,255,255,0.1) 100%)",
+        "radial-gradient(circle at 50% 20%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 20%, rgba(255,0,255,0.18) 40%, rgba(0,255,255,0.18) 60%, rgba(255,255,0,0.18) 80%, rgba(255,255,255,0.1) 100%)",
+        "radial-gradient(circle at 20% 80%, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 20%, rgba(0,255,255,0.18) 40%, rgba(255,0,255,0.18) 60%, rgba(255,255,0,0.18) 80%, rgba(255,255,255,0.1) 100%)"
+      ];
+
+      function randomBetween(a, b) {
+        return a + Math.random() * (b - a);
+      }
+
+      function createBubble() {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+
+        // Random size
+        const size = randomBetween(40, 120);
+        bubble.style.width = `${size}px`;
+        bubble.style.height = `${size}px`;
+
+        // Random position
+        bubble.style.left = `${randomBetween(0, window.innerWidth - size)}px`;
+
+        // Random rainbow gradient
+        bubble.style.background = gradients[Math.floor(Math.random() * gradients.length)];
+
+        // Random shape
+        bubble.style.borderRadius = shapes[Math.floor(Math.random() * shapes.length)];
+
+        // Random animation duration
+        const duration = randomBetween(6, 15);
+        bubble.style.animationDuration = `${duration}s`;
+
+        // Random opacity for variety
+        bubble.style.opacity = randomBetween(0.5, 0.9);
+
+        document.body.appendChild(bubble);
+
+        // Remove bubble after animation
+        bubble.addEventListener('animationend', () => {
+          bubble.remove();
+        });
+      }
+
+      // Create bubbles at intervals
+      setInterval(() => {
+        // 1 to 3 bubbles at a time
+        const count = Math.floor(randomBetween(1, 4));
+        for (let i = 0; i < count; i++) {
+          createBubble();
+        }
+      }, 700);
+
+      // Typing effect for the message with sound
+      const message = "Need a Job??";
+      const typedText = document.getElementById('typedText');
+      let idx = 0;
+      const typeSound = document.getElementById('typeSound');
+
+      // Keep track of all playing sounds
+      const playingSounds = [];
+
+      function playTypeSound() {
+        const sound = typeSound.cloneNode();
+        sound.volume = 0.5;
+        sound.play();
+        playingSounds.push(sound);
+      }
+
+      function stopAllTypeSounds() {
+        playingSounds.forEach(sound => {
+          sound.pause();
+          sound.currentTime = 0;
+        });
+        playingSounds.length = 0;
+      }
+
+      function typeMessage() {
+        if (idx <= message.length) {
+          typedText.textContent = message.slice(0, idx);
+          if (idx !== 0 && message[idx - 1] !== " ") {
+            playTypeSound();
+          }
+          idx++;
+          setTimeout(typeMessage, 200);
+        } else {
+          stopAllTypeSounds(); // Stop all sounds after typing is done
+        }
+      }
+
+      // Wait for user interaction before starting typing and sound
+      function startTypingOnInteraction() {
+        window.removeEventListener('click', startTypingOnInteraction);
+        window.removeEventListener('keydown', startTypingOnInteraction);
+        typeMessage();
+      }
+      window.addEventListener('click', startTypingOnInteraction);
+      window.addEventListener('keydown', startTypingOnInteraction);
+    </script>
+</body>
+</html>
