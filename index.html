@@ -120,7 +120,38 @@
 </head>
 <body>
     <div class="glossy-overlay"></div>
-    <div class="center-message"><span id="typedText"></span><span class="cursor">|</span></div>
+    <div class="center-message">
+      <span id="typedText"></span><span class="cursor">|</span>
+      <div id="afterTyping" style="display:none; margin-top: 2.5rem;">
+        <div id="tryText" style="
+          font-size:2.5rem;
+          margin-bottom:1.5rem;
+          font-family:'Anton', Arial, Helvetica, sans-serif;
+          opacity:0.95;
+          background: linear-gradient(90deg, #00cfff 0%, #ff0080 100%);
+          background-clip: text;
+          -webkit-background-clip: text;
+          color: transparent;
+          -webkit-text-fill-color: transparent;
+          text-shadow: 2px 2px 8px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.12);
+          ">
+          Try OurHeirScore
+        </div>
+        <button id="uploadBtn" style="
+          font-size:1.5rem;
+          padding: 0.7em 2em;
+          border-radius: 2em;
+          border: none;
+          background: linear-gradient(90deg, #00cfff 0%, #ff0080 100%);
+          color: #fff; /* This keeps the text visible */
+          font-family: 'Anton', Arial, Helvetica, sans-serif;
+          cursor: pointer;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+          transition: background 0.3s;
+        ">Upload Resume</button>
+        <input type="file" id="resumeInput" accept=".pdf,.doc,.docx" style="display:none;">
+      </div>
+    </div>
     <!-- Typing sound effect (hidden, short sound) -->
     <audio id="typeSound" src="keyboard-typing-sound-effect-335503.mp3" preload="auto"></audio>
     <script>
@@ -211,6 +242,25 @@
         playingSounds.length = 0;
       }
 
+      // Show "Try OurHeirScore" and button after typing
+      function showAfterTyping() {
+        document.getElementById('afterTyping').style.display = 'block';
+        // Add event listeners after the button is in the DOM
+        const uploadBtn = document.getElementById('uploadBtn');
+        const resumeInput = document.getElementById('resumeInput');
+        if (uploadBtn && resumeInput) {
+          uploadBtn.textContent = "Upload Resume"; // Ensure text is set
+          uploadBtn.addEventListener('click', () => resumeInput.click());
+          resumeInput.addEventListener('change', () => {
+            if (resumeInput.files.length > 0) {
+              uploadBtn.textContent = "Upload Resume"; // Always show this text
+              uploadBtn.style.background = "linear-gradient(90deg, #32CD32 0%, #00cfff 100%)";
+            }
+          });
+        }
+      }
+
+      // Update typeMessage to show afterTyping after done
       function typeMessage() {
         if (idx <= message.length) {
           typedText.textContent = message.slice(0, idx);
@@ -220,7 +270,8 @@
           idx++;
           setTimeout(typeMessage, 200);
         } else {
-          stopAllTypeSounds(); // Stop all sounds after typing is done
+          stopAllTypeSounds();
+          showAfterTyping();
         }
       }
 
